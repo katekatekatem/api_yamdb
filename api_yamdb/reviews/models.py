@@ -24,7 +24,7 @@ class Title(models.Model):
     """Модель произведений."""
 
     name = models.CharField(max_length=150)
-    year = models.IntegerField(validators=[validate_yaer], default=0)
+    year = models.IntegerField(validators=[validate_yaer])
     category = models.ForeignKey(
         'Category',
         related_name='titles',
@@ -36,9 +36,6 @@ class Title(models.Model):
         through='TitleGenre'
     )
     description = models.TextField(max_length=250, null=True)
-
-    # def get_rating(self):
-    #     return int(Review.objects.filter(title=self).aggregate(Avg('score'))) or 0
 
     class Meta:
         ordering = ['name']
