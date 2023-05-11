@@ -12,8 +12,10 @@ REST API
 
 ### **Авторы проекта:**
 
-Николай Синьков https://github.com/meveladron - Auth/Users
-Мурат Кертиев https://github.com/Murat-Kertiev - Categories/Genres/Titles
+Николай Синьков https://github.com/meveladron - Auth/Users,
+
+Мурат Кертиев https://github.com/Murat-Kertiev - Categories/Genres/Titles,
+
 Екатерина Мужжухина https://github.com/katekatekatem - Review/Comments (team leader)
 
 
