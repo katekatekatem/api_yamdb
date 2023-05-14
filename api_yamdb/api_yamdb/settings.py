@@ -1,11 +1,22 @@
 from pathlib import Path
+from datetime import timedelta
+import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+<<<<<<< HEAD
 SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
 
 DEBUG = True
+=======
+SECRET_KEY = os.getenv('SECRET_KEY', default='123')
+
+DEBUG = os.getenv('DEBUG_VALUE')
+>>>>>>> develop
 
 ALLOWED_HOSTS = ['127.0.0.1']
 
@@ -17,9 +28,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
     'rest_framework',
     'api',
     'reviews',
+=======
+    'rest_framework_simplejwt',
+    'rest_framework',
+    'django_filters',
+    'reviews',
+    'api',
+>>>>>>> develop
 ]
 
 MIDDLEWARE = [
@@ -39,7 +58,7 @@ TEMPLATES_DIR = BASE_DIR / 'templates'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATES_DIR],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -58,11 +77,14 @@ WSGI_APPLICATION = 'api_yamdb.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> develop
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.'
@@ -83,9 +105,15 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+<<<<<<< HEAD
 LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
+=======
+LANGUAGE_CODE = 'ru'
+
+TIME_ZONE = os.getenv('TIME_ZONE')
+>>>>>>> develop
 
 USE_I18N = True
 
@@ -95,7 +123,9 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+<<<<<<< HEAD
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
 REST_FRAMEWORK = {
@@ -103,3 +133,39 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 }
+=======
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+AUTH_USER_MODEL = 'reviews.CustomUser'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=14),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+SILENCED_SYSTEM_CHECKS = ['models.E006']
+
+YAMDB_EMAIL = os.getenv('YAMDB_EMAIL')
+
+RESERVED_USERNAMES = ['me', 'admin', 'moderator']
+>>>>>>> develop
