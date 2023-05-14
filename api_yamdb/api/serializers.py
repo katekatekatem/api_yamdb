@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from reviews.models import CustomUser
+from reviews.models import Category, CustomUser, Genre, Title
 from reviews.validators import names_validator_reserved, symbols_validator
 
 
@@ -49,3 +49,32 @@ class UserSerializer(AdminUserSerializer):
 
     class Meta(AdminUserSerializer.Meta):
         read_only_fields = ('role',)
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug',
+        required=False,
+    )
+    genres = serializers.SlugRelatedField(
+        slug_field='slug',
+        read_only=True,
+        many=True,
+    )
+
+    class Meta:
+        model = Title
+        fields = '__all__'
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = '__all__'
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
