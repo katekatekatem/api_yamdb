@@ -4,10 +4,7 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 
 
-
-
-
-def regex_validator(value):
+def symbols_validator(value):
     MESSAGE_SYMBOLS = 'Некорректные символы: {}'
     invalid_simbols = ''.join(set(re.sub(r'([\w.@+-]+)', '', str(value))))
     if invalid_simbols:
@@ -15,7 +12,7 @@ def regex_validator(value):
     return value
 
 
-def reserved_names_validator(value):
+def names_validator_reserved(value):
     MESSAGE = 'Невозможно использовать {} в качестве имени пользователя.'
     for reserved_username in settings.RESERVED_USERNAMES:
         if value == reserved_username:

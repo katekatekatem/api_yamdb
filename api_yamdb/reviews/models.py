@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from .validators import regex_validator, reserved_names_validator
+from .validators import symbols_validator, names_validator_reserved
 
 USER = 'user'
 MODERATOR = 'moderator'
@@ -20,8 +20,8 @@ class CustomUser(AbstractUser):
         max_length=150,
         unique=True,
         validators=[
-            regex_validator,
-            reserved_names_validator
+            symbols_validator,
+            names_validator_reserved
         ],
     )
     email = models.EmailField(

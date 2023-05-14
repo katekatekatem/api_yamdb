@@ -1,13 +1,13 @@
 from rest_framework import serializers
 from reviews.models import CustomUser
-from reviews.validators import reserved_names_validator, regex_validator
+from reviews.validators import names_validator_reserved, symbols_validator
 
 
 class SignupSerializer(serializers.Serializer):
     username = serializers.CharField(
         max_length=150,
         required=True,
-        validators=[regex_validator, reserved_names_validator]
+        validators=[symbols_validator, names_validator_reserved]
     )
     email = serializers.EmailField(
         max_length=150,
@@ -19,7 +19,7 @@ class TokenSerializer(serializers.Serializer):
     username = serializers.CharField(
         max_length=150,
         required=True,
-        validators=[regex_validator, reserved_names_validator]
+        validators=[symbols_validator, names_validator_reserved]
     )
     confirmation_code = serializers.CharField(
         required=True
@@ -40,8 +40,8 @@ class AdminUserSerializer(serializers.ModelSerializer):
         )
 
     def validate_username(self, value):
-        regex_validator(value)
-        reserved_names_validator(value)
+        symbols_validator(value)
+        names_validator_reserved(value)
         return value
 
 
