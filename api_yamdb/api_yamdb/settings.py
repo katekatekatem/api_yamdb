@@ -8,17 +8,11 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-<<<<<<< HEAD
 SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
 
 DEBUG = True
-=======
-SECRET_KEY = os.getenv('SECRET_KEY', default='123')
 
-DEBUG = os.getenv('DEBUG_VALUE')
->>>>>>> develop
-
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 INSTALLED_APPS = [
@@ -28,17 +22,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
-    'rest_framework',
-    'api',
-    'reviews',
-=======
     'rest_framework_simplejwt',
     'rest_framework',
     'django_filters',
     'reviews',
     'api',
->>>>>>> develop
 ]
 
 MIDDLEWARE = [
@@ -54,7 +42,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'api_yamdb.urls'
 
 TEMPLATES_DIR = BASE_DIR / 'templates'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -81,39 +68,25 @@ DATABASES = {
     }
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.'
-        'UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.'
-        'MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.'
-        'CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.'
-        'NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
 
-<<<<<<< HEAD
-LANGUAGE_CODE = 'ru-RU'
-
-TIME_ZONE = 'UTC'
-=======
 LANGUAGE_CODE = 'ru'
 
-TIME_ZONE = os.getenv('TIME_ZONE')
->>>>>>> develop
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -123,21 +96,12 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-<<<<<<< HEAD
-STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ],
-}
-=======
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
+STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
@@ -168,4 +132,3 @@ SILENCED_SYSTEM_CHECKS = ['models.E006']
 YAMDB_EMAIL = os.getenv('YAMDB_EMAIL')
 
 RESERVED_USERNAMES = ['me', 'admin', 'moderator']
->>>>>>> develop

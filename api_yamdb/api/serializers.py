@@ -54,14 +54,41 @@ class UserSerializer(AdminUserSerializer):
         read_only_fields = ('role',)
 
 
-class TitleSerializer(serializers.ModelSerializer):
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Genre
+        fields = ('name', 'slug')
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('name', 'slug')
+
+
+class TitleCreateSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
-        slug_field='slug',
-        required=False,
+        slug_field='slug'
     )
-    genres = serializers.SlugRelatedField(
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(),
         slug_field='slug',
+        many=True,
+    )
+
+    class Meta:
+        model = Title
+        fields = '__all__'
+
+
+class TitleReadSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(
+        read_only=True,
+    )
+    genre = GenreSerializer(
         read_only=True,
         many=True,
     )
@@ -75,21 +102,7 @@ class TitleSerializer(serializers.ModelSerializer):
         rating = obj.reviews.aggregate(Avg('score')).get('score__avg')
         if not rating:
             return rating
-        return round(rating, 1)
-
-
-class GenreSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Genre
-        fields = '__all__'
-
-
-class CategorySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Category
-        fields = '__all__'
+        return int(rating)
 
 
 class ReviewSerializer(serializers.ModelSerializer):

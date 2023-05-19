@@ -19,6 +19,14 @@ ROLES = (
 )
 
 
+def validate_year(year):
+    """Валидация даты релиза."""
+
+    current_year = dt.datetime.today().year
+    if not (START_YEAR <= year <= current_year):
+        raise ValidationError('Неподходящее значение')
+
+
 class CustomUser(AbstractUser):
     """Модель пользователя."""
 
@@ -62,15 +70,6 @@ class CustomUser(AbstractUser):
         return self.role == MODERATOR
 
 
-def validate_year(year):
-
-    """Валидация даты релиза."""
-
-    current_year = dt.datetime.today().year
-    if not (START_YEAR <= year <= current_year):
-        raise ValidationError('Неподходящее значение')
-
-
 class Title(models.Model):
     """Модель произведений."""
 
@@ -79,12 +78,14 @@ class Title(models.Model):
     category = models.ForeignKey(
         'Category',
         related_name='titles',
-        blank=True, null=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL
     )
-    genres = models.ManyToManyField(
+    genre = models.ManyToManyField(
         'Genre',
-        through='TitleGenre'
+        related_name='titles',
+        blank=True
     )
     description = models.TextField(max_length=250, null=True)
 
@@ -115,7 +116,7 @@ class Genre(models.Model):
 class Category(models.Model):
     """Модель категорий."""
 
-    name = models.CharField(max_length=150,)
+    name = models.CharField(max_length=150)
     slug = models.SlugField(max_length=100, unique=True)
 
     class Meta:
@@ -127,16 +128,6 @@ class Category(models.Model):
         return self.slug[:10]
 
 
-class TitleGenre(models.Model):
-    """Связующая модель жанров и произведений."""
-
-    title = models.ForeignKey(Title, on_delete=models.CASCADE)
-    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f'{self.title}, {self.genre}'
-
-
 class Review(models.Model):
     """Модель отзывов."""
 
@@ -146,7 +137,7 @@ class Review(models.Model):
         related_name='reviews',
     )
     author = models.ForeignKey(
-        User,
+        'CustomUser',
         on_delete=models.CASCADE,
         related_name='reviews',
     )
@@ -180,7 +171,7 @@ class Comment(models.Model):
         related_name='comments',
     )
     author = models.ForeignKey(
-        User,
+        'CustomUser',
         on_delete=models.CASCADE,
         related_name='comments',
     )

@@ -20,7 +20,7 @@ class TitleAdmin(admin.ModelAdmin):
         'description',
     )
     search_fields = ('name',)
-    list_filter = ('name', 'year',)
+    list_filter = ('name', 'year')
     empty_value_display = '-пусто-'
 
 
@@ -36,6 +36,18 @@ class GenreAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = [
+        'pk',
+        'name',
+        'slug',
+    ]
+    search_fields = ('name',)
+    list_filter = ('name',)
+    empty_value_display = '-пусто-'
+
+
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = (
@@ -46,6 +58,8 @@ class ReviewAdmin(admin.ModelAdmin):
         'score',
         'pub_date',
     )
+    search_fields = ('text',)
+    list_filter = ('title', 'author', 'score', 'pub_date')
     empty_value_display = '-пусто-'
 
 
@@ -58,4 +72,6 @@ class CommentAdmin(admin.ModelAdmin):
         'text',
         'pub_date',
     )
+    search_fields = ('text',)
+    list_filter = ('review', 'author', 'pub_date')
     empty_value_display = '-пусто-'
