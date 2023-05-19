@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -141,7 +140,6 @@ class CategoryViewSet(MixinViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    pagination_class = PageNumberPagination
     permission_classes = (IsStaffOrAuthorOrReadOnlyPermission,)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
@@ -157,9 +155,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    pagination_class = PageNumberPagination
     permission_classes = (IsStaffOrAuthorOrReadOnlyPermission,)
-    http_method_names = ['get', 'post', 'head']
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
