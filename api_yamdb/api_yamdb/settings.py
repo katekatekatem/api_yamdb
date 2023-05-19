@@ -1,4 +1,3 @@
-import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -19,7 +18,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework.simplejwt',
+    'rest_framework_simplejwt',
     'rest_framework',
     'django_filters',
     'reviews',
@@ -61,7 +60,7 @@ WSGI_APPLICATION = 'api_yamdb.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -95,6 +94,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
@@ -124,6 +124,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 SILENCED_SYSTEM_CHECKS = ['models.E006']
 
-YAMDB_EMAIL = os.getenv('YAMDB_EMAIL')
+YAMDB_EMAIL = ['YAMDB_EMAIL']
 
 RESERVED_USERNAMES = ['me', 'admin', 'moderator']
