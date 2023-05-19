@@ -1,30 +1,22 @@
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models
 import datetime as dt
 
-from .validators import symbols_validator, names_validator_reserved
-
+from .validators import (names_validator_reserved, symbols_validator,
+                         validate_title_year)
 
 USER = 'user'
 MODERATOR = 'moderator'
 ADMIN = 'admin'
-START_YEAR = 0
+
 
 ROLES = (
     (USER, 'Пользователь'),
     (MODERATOR, 'Модератор'),
     (ADMIN, 'Администратор'),
 )
-
-
-def validate_year(year):
-    """Валидация даты релиза."""
-
-    current_year = dt.datetime.today().year
-    if not (START_YEAR <= year <= current_year):
-        raise ValidationError('Неподходящее значение')
 
 
 class CustomUser(AbstractUser):
@@ -74,18 +66,16 @@ class Title(models.Model):
     """Модель произведений."""
 
     name = models.CharField(max_length=150)
-    year = models.IntegerField(validators=[validate_year])
+    year = models.IntegerField(validators=[validate_title_year])
     category = models.ForeignKey(
         'Category',
         related_name='titles',
-        null=True,
-        blank=True,
+        null=True, blank=True,
         on_delete=models.SET_NULL
     )
     genre = models.ManyToManyField(
         'Genre',
-        related_name='titles',
-        blank=True
+        through='TitleGenre'
     )
     description = models.TextField(max_length=250, null=True)
 
@@ -102,7 +92,7 @@ class Genre(models.Model):
     """Модель жанров."""
 
     name = models.CharField(max_length=150)
-    slug = models.SlugField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
         ordering = ['name']
@@ -116,8 +106,8 @@ class Genre(models.Model):
 class Category(models.Model):
     """Модель категорий."""
 
-    name = models.CharField(max_length=150)
-    slug = models.SlugField(max_length=100, unique=True)
+    name = models.CharField(max_length=150,)
+    slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
         ordering = ['name']
@@ -126,6 +116,16 @@ class Category(models.Model):
 
     def __str__(self):
         return self.slug[:10]
+
+
+class TitleGenre(models.Model):
+    """Связующая модель жанров и произведений."""
+
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.title} {self.genre}'
 
 
 class Review(models.Model):

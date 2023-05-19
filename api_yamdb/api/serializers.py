@@ -3,7 +3,8 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
-from reviews.validators import names_validator_reserved, symbols_validator
+from reviews.validators import (names_validator_reserved, symbols_validator,
+                                validate_title_year)
 
 
 class SignupSerializer(serializers.Serializer):
@@ -59,6 +60,7 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ('name', 'slug')
+        lookup_field = 'slug'
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -66,6 +68,25 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('name', 'slug')
+        lookup_field = 'slug'
+
+
+class TitleReadSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(
+        read_only=True,
+        many=True
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Title
+
+    def get_rating(self, obj):
+        rating = obj.reviews.aggregate(Avg('score')).get('score__avg')
+        if not rating:
+            return rating
+        return int(rating)
 
 
 class TitleCreateSerializer(serializers.ModelSerializer):
@@ -76,33 +97,15 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(),
         slug_field='slug',
-        many=True,
+        many=True
     )
 
     class Meta:
-        model = Title
         fields = '__all__'
-
-
-class TitleReadSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(
-        read_only=True,
-    )
-    genre = GenreSerializer(
-        read_only=True,
-        many=True,
-    )
-    rating = serializers.SerializerMethodField()
-
-    class Meta:
         model = Title
-        fields = '__all__'
 
-    def get_rating(self, obj):
-        rating = obj.reviews.aggregate(Avg('score')).get('score__avg')
-        if not rating:
-            return rating
-        return int(rating)
+    def validate_year(self, value):
+        return validate_title_year(value)
 
 
 class ReviewSerializer(serializers.ModelSerializer):

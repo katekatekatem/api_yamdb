@@ -1,7 +1,8 @@
+import datetime as dt
 import re
 
-from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 
 def symbols_validator(value):
@@ -17,4 +18,11 @@ def names_validator_reserved(value):
     for reserved_username in settings.RESERVED_USERNAMES:
         if value == reserved_username:
             raise ValidationError(MESSAGE.format(value))
+    return value
+
+
+def validate_title_year(value):
+    year = dt.date.today().year
+    if not (value <= year):
+        raise ValidationError('Некорректный год.')
     return value
