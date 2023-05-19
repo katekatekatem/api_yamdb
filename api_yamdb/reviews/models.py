@@ -1,15 +1,13 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.core.exceptions import ValidationError
-import datetime as dt
 
-from .validators import symbols_validator, names_validator_reserved
-
+from .validators import (names_validator_reserved, symbols_validator,
+                         validate_title_year)
 
 USER = 'user'
 MODERATOR = 'moderator'
 ADMIN = 'admin'
-START_YEAR = 0
+
 
 ROLES = (
     (USER, 'Пользователь'),
@@ -61,26 +59,18 @@ class CustomUser(AbstractUser):
         return self.role == MODERATOR
 
 
-def validate_year(year):
-    """Валидация даты релиза."""
-
-    current_year = dt.datetime.today().year
-    if not (START_YEAR <= year <= current_year):
-        raise ValidationError('Неподходящее значение')
-
-
 class Title(models.Model):
     """Модель произведений."""
 
     name = models.CharField(max_length=150)
-    year = models.IntegerField(validators=[validate_year])
+    year = models.IntegerField(validators=[validate_title_year])
     category = models.ForeignKey(
         'Category',
         related_name='titles',
         blank=True, null=True,
         on_delete=models.SET_NULL
     )
-    genres = models.ManyToManyField(
+    genre = models.ManyToManyField(
         'Genre',
         through='TitleGenre'
     )
@@ -99,7 +89,7 @@ class Genre(models.Model):
     """Модель жанров."""
 
     name = models.CharField(max_length=150)
-    slug = models.SlugField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
         ordering = ['name']
@@ -114,7 +104,7 @@ class Category(models.Model):
     """Модель категорий."""
 
     name = models.CharField(max_length=150,)
-    slug = models.SlugField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
         ordering = ['name']
@@ -127,9 +117,16 @@ class Category(models.Model):
 
 class TitleGenre(models.Model):
     """Связующая модель жанров и произведений."""
-
     title = models.ForeignKey(Title, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.title}, {self.genre}'
+        return f'{self.title} {self.genre}'
+
+
+class Review(models.Model):
+    pass
+
+
+class Comments(models.Model):
+    pass
