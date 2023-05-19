@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from reviews.models import Category, CustomUser, Genre, Title
-from reviews.validators import names_validator_reserved, symbols_validator
+from reviews.validators import (names_validator_reserved, symbols_validator,
+                                validate_title_year)
 
 
 class SignupSerializer(serializers.Serializer):
@@ -51,30 +52,46 @@ class UserSerializer(AdminUserSerializer):
         read_only_fields = ('role',)
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(
-        queryset=Category.objects.all(),
-        slug_field='slug',
-        required=False,
-    )
-    genres = serializers.SlugRelatedField(
-        slug_field='slug',
-        read_only=True,
-        many=True,
-    )
-
-    class Meta:
-        model = Title
-        fields = '__all__'
-
-
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = '__all__'
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
+
+
+class TitleReadSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(
+        read_only=True,
+        many=True
+    )
+
+    class Meta:
         fields = '__all__'
+        model = Title
+
+
+class TitleCreateSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug'
+    )
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+        many=True
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Title
+
+    def validate_year(self, value):
+        return validate_title_year(value)

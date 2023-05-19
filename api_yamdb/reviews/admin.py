@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Category, CustomUser, Genre, Title 
+
+from .models import Category, CustomUser, Genre, Title
 
 
 @admin.register(CustomUser)
