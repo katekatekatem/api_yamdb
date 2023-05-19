@@ -1,5 +1,9 @@
+from django.core.exceptions import ValidationError
+from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from reviews.models import Category, CustomUser, Genre, Title
+
+from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
 from reviews.validators import (names_validator_reserved, symbols_validator,
                                 validate_title_year)
 
@@ -53,6 +57,7 @@ class UserSerializer(AdminUserSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Genre
         fields = ('name', 'slug')
@@ -60,6 +65,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Category
         fields = ('name', 'slug')
@@ -72,10 +78,17 @@ class TitleReadSerializer(serializers.ModelSerializer):
         read_only=True,
         many=True
     )
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         fields = '__all__'
         model = Title
+
+    def get_rating(self, obj):
+        rating = obj.reviews.aggregate(Avg('score')).get('score__avg')
+        if not rating:
+            return rating
+        return int(rating)
 
 
 class TitleCreateSerializer(serializers.ModelSerializer):
@@ -95,3 +108,35 @@ class TitleCreateSerializer(serializers.ModelSerializer):
 
     def validate_year(self, value):
         return validate_title_year(value)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+    def validate(self, data):
+        request = self.context['request']
+        title_id = self.context.get('view').kwargs.get('title_id')
+        title = get_object_or_404(Title, pk=title_id)
+        if (
+            request.method == 'POST' and Review.objects.filter(
+                title=title, author=request.user
+            ).exists()
+        ):
+            raise ValidationError('Вы уже оставили отзыв на это произведение.')
+        return data
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'author', 'pub_date')
