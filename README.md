@@ -61,65 +61,47 @@ GET .../api/v1/titles/{title_id}/reviews/
 
 Пример ответа: 
 
-> [
->
->   {
->
->     "count": 0,
->
->     "next": "string",
->
->     "previous": "string",
->
->     "results": [
->
->       {
->
->         "id": 0,
->
->         "text": "string",
->
->         "author": "string",
->
->         "score": 1,
->
->         "pub_date": "2019-08-24T14:15:22Z"
->
->       }
->
->     ]
->
->   }
->
-> ]
+```
+[
+  {
+    "count": 0,
+    "next": "string",
+    "previous": "string",
+    "results": [
+      {
+        "id": 0,
+        "text": "string",
+        "author": "string",
+        "score": 1,
+        "pub_date": "2019-08-24T14:15:22Z"
+      }
+    ]
+  }
+]
+```
 
 POST .../api/v1/titles/{title_id}/reviews/
 
 Добавить новый отзыв. Пользователь может оставить только один отзыв на произведение. Права доступа: Аутентифицированные пользователи.
 
-> {
->
->     "text": "string",
->
->     "score": 1
->
-> } 
+```
+{
+    "text": "string",
+    "score": 1
+}
+``` 
 
 Пример ответа:
 
-> {
->
->   "id": 0,
->
->   "text": "string",
->
->   "author": "string",
->
->   "score": 1,
->
->   "pub_date": "2019-08-24T14:15:22Z"
->
-> }
+```
+{
+  "id": 0,
+  "text": "string",
+  "author": "string",
+  "score": 1,
+  "pub_date": "2019-08-24T14:15:22Z"
+}
+```
 
 GET или PATCH .../api/v1/titles/{title_id}/reviews/{review_id}/
 
@@ -129,29 +111,24 @@ GET или PATCH .../api/v1/titles/{title_id}/reviews/{review_id}/
 
 Пример запроса для PATCH:
 
-> {
->
->   "text": "string", 
->
->   "score": 1
->
-> }
+```
+{
+  "text": "string", 
+  "score": 1
+}
+```
 
 Пример ответа для GET и PATCH:
 
-> {
->
->   "id": 0,
->
->   "text": "string",
->
->   "author": "string",
->
->   "score": 1,
->
->   "pub_date": "2019-08-24T14:15:22Z"
->
-> }
+```
+{
+  "id": 0,
+  "text": "string",
+  "author": "string",
+  "score": 1,
+  "pub_date": "2019-08-24T14:15:22Z"
+}
+```
 
 DELETE .../api/v1/titles/{title_id}/reviews/{review_id}/
 
@@ -165,59 +142,44 @@ GET .../api/v1/titles/{title_id}/reviews/{review_id}/comments/
 
 Пример ответа: 
 
-> [
->
->   {
->
->     "count": 0,
->
->     "next": "string",
->
->     "previous": "string",
->
->     "results": [
->
->       {
->
->         "id": 0,
->
->         "text": "string",
->
->         "author": "string",
->
->         "pub_date": "2019-08-24T14:15:22Z"
->
->       }
->
->     ]
->
->   }
->
-> ]
+```
+[
+  {
+    "count": 0,
+    "next": "string",
+    "previous": "string",
+    "results": [
+      {
+        "id": 0,
+        "text": "string",
+        "author": "string",
+        "pub_date": "2019-08-24T14:15:22Z"
+      }
+    ]
+  }
+]
+```
 
 POST .../api/v1/titles/{title_id}/reviews/{review_id}/comments/
 
 Добавить новый комментарий к отзыву. Права доступа: Аутентифицированные пользователи.
 
-> {
->
->     "text": "string",
->
-> } 
+```
+{
+    "text": "string",
+} 
+```
 
 Пример ответа:
 
-> {
->
->   "id": 0,
->
->   "text": "string",
->
->   "author": "string",
->
->   "pub_date": "2019-08-24T14:15:22Z"
->
-> }
+```
+{
+  "id": 0,
+  "text": "string",
+  "author": "string",
+  "pub_date": "2019-08-24T14:15:22Z"
+}
+```
 
 GET или PATCH .../api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/
 
@@ -227,25 +189,22 @@ GET или PATCH .../api/v1/titles/{title_id}/reviews/{review_id}/comments/{comm
 
 Пример запроса для PATCH:
 
-> {
->
->   "text": "string"
->
-> }
+```
+{
+  "text": "string"
+}
+```
 
 Пример ответа для GET и PATCH:
 
-> {
->
->   "id": 0,
->
->   "text": "string",
->
->   "author": "string",
->
->   "pub_date": "2019-08-24T14:15:22Z"
->
-> }
+```
+{
+  "id": 0,
+  "text": "string",
+  "author": "string",
+  "pub_date": "2019-08-24T14:15:22Z"
+}
+```
 
 DELETE .../api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/
 
