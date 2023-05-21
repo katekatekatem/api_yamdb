@@ -64,7 +64,7 @@ class CustomUser(AbstractUser):
 class Title(models.Model):
     """Модель произведений."""
 
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=256)
     year = models.IntegerField(validators=[validate_title_year])
     category = models.ForeignKey(
         'Category',
@@ -90,7 +90,7 @@ class Title(models.Model):
 class Genre(models.Model):
     """Модель жанров."""
 
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
@@ -105,7 +105,7 @@ class Genre(models.Model):
 class Category(models.Model):
     """Модель категорий."""
 
-    name = models.CharField(max_length=150,)
+    name = models.CharField(max_length=256,)
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
