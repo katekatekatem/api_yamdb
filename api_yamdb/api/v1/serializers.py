@@ -2,9 +2,8 @@ from django.core.exceptions import ValidationError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
-from reviews.validators import (names_validator_reserved, symbols_validator)
+from reviews.validators import names_validator_reserved, symbols_validator
 
 
 class SignupSerializer(serializers.Serializer):

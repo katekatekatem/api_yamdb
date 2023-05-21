@@ -9,18 +9,16 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
 
 from .filters import TitleFilter
 from .mixins import ListModelCreateDestroyViewSet
 from .permissions import (AdminPermission, IsAdminOrReadOnlyPermission,
                           IsStaffOrAuthorOrReadOnlyPermission)
 from .serializers import (AdminUserSerializer, CategorySerializer,
-                          CommentSerializer, GenreSerializer,
-                          ReviewSerializer, SignupSerializer,
-                          TitleCreateSerializer, TitleReadSerializer,
-                          TokenSerializer, UserSerializer)
-from reviews.models import (Comment, Category, CustomUser,
-                            Genre, Review, Title)
+                          CommentSerializer, GenreSerializer, ReviewSerializer,
+                          SignupSerializer, TitleCreateSerializer,
+                          TitleReadSerializer, TokenSerializer, UserSerializer)
 
 
 class SignUpView(APIView):
