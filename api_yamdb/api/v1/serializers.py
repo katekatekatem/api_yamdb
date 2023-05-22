@@ -1,28 +1,28 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
-from reviews.validators import (names_validator_reserved, symbols_validator,
-                                validate_title_year)
+from reviews.validators import (names_validator_reserved, symbols_validator)
 
 
 class SignupSerializer(serializers.Serializer):
     username = serializers.CharField(
-        max_length=150,
+        max_length=settings.USERNAME_LENGHT,
         required=True,
         validators=[symbols_validator, names_validator_reserved]
     )
     email = serializers.EmailField(
-        max_length=150,
+        max_length=settings.EMAIL_LENGHT,
         required=True
     )
 
 
 class TokenSerializer(serializers.Serializer):
     username = serializers.CharField(
-        max_length=150,
+        max_length=settings.USERNAME_LENGHT,
         required=True,
         validators=[symbols_validator, names_validator_reserved]
     )
@@ -43,11 +43,6 @@ class AdminUserSerializer(serializers.ModelSerializer):
             'bio',
             'role'
         )
-
-    def validate_username(self, value):
-        symbols_validator(value)
-        names_validator_reserved(value)
-        return value
 
 
 class UserSerializer(AdminUserSerializer):
@@ -105,9 +100,6 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Title
-
-    def validate_year(self, value):
-        return validate_title_year(value)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
