@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from api_yamdb.settings import NAME_LENGTH
 from .validators import (names_validator_reserved, symbols_validator,
                          validate_title_year)
 
@@ -63,8 +64,8 @@ class CustomUser(AbstractUser):
 class Title(models.Model):
     """Модель произведений."""
 
-    name = models.CharField(max_length=150)
-    year = models.IntegerField(validators=[validate_title_year])
+    name = models.CharField(max_length=NAME_LENGTH)
+    year = models.SmallIntegerField(validators=[validate_title_year])
     category = models.ForeignKey(
         'Category',
         related_name='titles',
@@ -89,7 +90,7 @@ class Title(models.Model):
 class Genre(models.Model):
     """Модель жанров."""
 
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=NAME_LENGTH)
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
@@ -104,7 +105,7 @@ class Genre(models.Model):
 class Category(models.Model):
     """Модель категорий."""
 
-    name = models.CharField(max_length=150,)
+    name = models.CharField(max_length=NAME_LENGTH)
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
@@ -157,7 +158,7 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.text[:30]
+        return self.text[:settings.REV_AND_COM_STR_LENGTH]
 
 
 class Comment(models.Model):
@@ -182,4 +183,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.text[:30]
+        return self.text[:settings.REV_AND_COM_STR_LENGTH]

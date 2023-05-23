@@ -50,8 +50,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Category',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=150)),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=256)),
                 ('slug', models.SlugField(unique=True)),
             ],
             options={
@@ -63,8 +63,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Genre',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=150)),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=256)),
                 ('slug', models.SlugField(unique=True)),
             ],
             options={
@@ -76,8 +76,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Title',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=150)),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=256)),
                 ('year', models.IntegerField(validators=[reviews.validators.validate_title_year])),
                 ('description', models.TextField(max_length=250, null=True)),
                 ('category', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='titles', to='reviews.Category')),
@@ -104,12 +104,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Review',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('text', models.TextField()),
                 ('score', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(10)])),
                 ('pub_date', models.DateTimeField(auto_now_add=True)),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to=settings.AUTH_USER_MODEL)),
-                ('title', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='reviews.Title')),
+                ('title', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='reviews.title')),
             ],
             options={
                 'verbose_name': 'Отзыв',
@@ -120,11 +120,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Comment',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('text', models.TextField()),
                 ('pub_date', models.DateTimeField(auto_now_add=True)),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to=settings.AUTH_USER_MODEL)),
-                ('review', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='reviews.Review')),
+                ('review', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='reviews.review')),
             ],
             options={
                 'verbose_name': 'Комментарий',

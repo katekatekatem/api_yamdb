@@ -2,7 +2,6 @@ from datetime import timedelta
 from pathlib import Path
 import os
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
@@ -133,3 +132,5 @@ RESERVED_USERNAMES = ['me']
 
 EMAIL_LENGHT = 254
 USERNAME_LENGHT = 150
+NAME_LENGTH = 256
+REV_AND_COM_STR_LENGTH = 30
