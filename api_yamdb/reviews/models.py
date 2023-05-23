@@ -1,10 +1,10 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from .validators import (names_validator_reserved, symbols_validator,
                          validate_title_year)
-
 
 USER = 'user'
 MODERATOR = 'moderator'
@@ -158,7 +158,7 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.text[:30]
+        return self.text[:settings.REV_AND_COM_STR_LENGTH]
 
 
 class Comment(models.Model):
@@ -183,4 +183,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.text[:30]
+        return self.text[:settings.REV_AND_COM_STR_LENGTH]
