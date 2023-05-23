@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db import IntegrityError
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
@@ -11,7 +12,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .filters import TitleFilter
-from .mixins import ListModelCreateDestroyViewSet
+from .mixins import ListCreateDestroyViewSet
 from .permissions import (IsAdminPermission, IsAdminOrReadOnlyPermission,
                           IsStaffOrAuthorOrReadOnlyPermission)
 from .serializers import (AdminUserSerializer, CategorySerializer,
@@ -134,7 +135,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     permission_classes = (IsAdminOrReadOnlyPermission,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
@@ -146,12 +147,12 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleReadSerializer
 
 
-class GenreViewSet(ListModelCreateDestroyViewSet):
+class GenreViewSet(ListCreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
 
-class CategoryViewSet(ListModelCreateDestroyViewSet):
+class CategoryViewSet(ListCreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 

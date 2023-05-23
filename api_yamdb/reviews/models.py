@@ -3,14 +3,13 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from api_yamdb.settings import NAME_LENGTH
 from .validators import (names_validator_reserved, symbols_validator,
                          validate_title_year)
+
 
 USER = 'user'
 MODERATOR = 'moderator'
 ADMIN = 'admin'
-
 
 ROLES = (
     (USER, 'Пользователь'),
@@ -64,7 +63,7 @@ class CustomUser(AbstractUser):
 class Title(models.Model):
     """Модель произведений."""
 
-    name = models.CharField(max_length=NAME_LENGTH)
+    name = models.CharField(max_length=settings.NAME_LENGTH)
     year = models.SmallIntegerField(validators=[validate_title_year])
     category = models.ForeignKey(
         'Category',
@@ -76,7 +75,7 @@ class Title(models.Model):
         'Genre',
         through='TitleGenre'
     )
-    description = models.TextField(max_length=250, null=True)
+    description = models.TextField(null=True)
 
     class Meta:
         ordering = ['name']
@@ -84,14 +83,14 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return self.name[:15]
+        return self.name[:settings.TIT_GEN_CAT_STR_LENGTH]
 
 
 class Genre(models.Model):
     """Модель жанров."""
 
-    name = models.CharField(max_length=NAME_LENGTH)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField(max_length=settings.NAME_LENGTH)
+    slug = models.SlugField(max_length=settings.SLUG_LENGTH, unique=True)
 
     class Meta:
         ordering = ['name']
@@ -99,14 +98,14 @@ class Genre(models.Model):
         verbose_name_plural = 'Жанры'
 
     def __str__(self):
-        return self.name[:15]
+        return self.name[:settings.TIT_GEN_CAT_STR_LENGTH]
 
 
 class Category(models.Model):
     """Модель категорий."""
 
-    name = models.CharField(max_length=NAME_LENGTH)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField(max_length=settings.NAME_LENGTH)
+    slug = models.SlugField(max_length=settings.SLUG_LENGTH, unique=True)
 
     class Meta:
         ordering = ['name']
@@ -114,7 +113,7 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.slug[:10]
+        return self.slug[:settings.TIT_GEN_CAT_STR_LENGTH]
 
 
 class TitleGenre(models.Model):
