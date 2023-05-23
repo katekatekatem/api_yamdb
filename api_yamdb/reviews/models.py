@@ -1,6 +1,7 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 from .validators import (names_validator_reserved, symbols_validator,
                          validate_title_year)
@@ -9,7 +10,6 @@ from .validators import (names_validator_reserved, symbols_validator,
 USER = 'user'
 MODERATOR = 'moderator'
 ADMIN = 'admin'
-
 
 ROLES = (
     (USER, 'Пользователь'),
@@ -20,10 +20,9 @@ ROLES = (
 
 class CustomUser(AbstractUser):
     """Модель пользователя."""
-
     username = models.CharField(
         verbose_name='Имя пользователя',
-        max_length=150,
+        max_length=settings.USERNAME_LENGHT,
         unique=True,
         validators=[
             symbols_validator,
@@ -32,7 +31,7 @@ class CustomUser(AbstractUser):
     )
     email = models.EmailField(
         verbose_name='Адрес эл. почты',
-        max_length=150,
+        max_length=settings.EMAIL_LENGHT,
         unique=True
     )
     bio = models.TextField(
@@ -54,7 +53,7 @@ class CustomUser(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.is_staff or self.role == ADMIN
+        return self.is_staff or self.role == ADMIN or self.is_superuser
 
     @property
     def is_moderator(self):
@@ -64,8 +63,8 @@ class CustomUser(AbstractUser):
 class Title(models.Model):
     """Модель произведений."""
 
-    name = models.CharField(max_length=150)
-    year = models.IntegerField(validators=[validate_title_year])
+    name = models.CharField(max_length=settings.NAME_LENGTH)
+    year = models.SmallIntegerField(validators=[validate_title_year])
     category = models.ForeignKey(
         'Category',
         related_name='titles',
@@ -76,7 +75,7 @@ class Title(models.Model):
         'Genre',
         through='TitleGenre'
     )
-    description = models.TextField(max_length=250, null=True)
+    description = models.TextField(null=True)
 
     class Meta:
         ordering = ['name']
@@ -84,14 +83,14 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return self.name[:15]
+        return self.name[:settings.TIT_GEN_CAT_STR_LENGTH]
 
 
 class Genre(models.Model):
     """Модель жанров."""
 
-    name = models.CharField(max_length=150)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField(max_length=settings.NAME_LENGTH)
+    slug = models.SlugField(max_length=settings.SLUG_LENGTH, unique=True)
 
     class Meta:
         ordering = ['name']
@@ -99,14 +98,14 @@ class Genre(models.Model):
         verbose_name_plural = 'Жанры'
 
     def __str__(self):
-        return self.name[:15]
+        return self.name[:settings.TIT_GEN_CAT_STR_LENGTH]
 
 
 class Category(models.Model):
     """Модель категорий."""
 
-    name = models.CharField(max_length=150,)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField(max_length=settings.NAME_LENGTH)
+    slug = models.SlugField(max_length=settings.SLUG_LENGTH, unique=True)
 
     class Meta:
         ordering = ['name']
@@ -114,7 +113,7 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.slug[:10]
+        return self.slug[:settings.TIT_GEN_CAT_STR_LENGTH]
 
 
 class TitleGenre(models.Model):
@@ -158,7 +157,7 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.text[:30]
+        return self.text[:settings.REV_AND_COM_STR_LENGTH]
 
 
 class Comment(models.Model):
@@ -183,4 +182,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.text[:30]
+        return self.text[:settings.REV_AND_COM_STR_LENGTH]

@@ -1,6 +1,6 @@
 from datetime import timedelta
 from pathlib import Path
-
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -60,7 +60,7 @@ WSGI_APPLICATION = 'api_yamdb.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': str(BASE_DIR / 'db.sqlite3'),
     }
 }
 
@@ -103,6 +103,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 AUTH_USER_MODEL = 'reviews.CustomUser'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'send_mail')
+DEFAULT_FROM_EMAIL = 'email@email.ru'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -126,4 +128,11 @@ SILENCED_SYSTEM_CHECKS = ['models.E006']
 
 YAMDB_EMAIL = ['YAMDB_EMAIL']
 
-RESERVED_USERNAMES = ['me', 'admin', 'moderator']
+RESERVED_USERNAMES = ['me']
+
+EMAIL_LENGHT = 254
+USERNAME_LENGHT = 150
+NAME_LENGTH = 256
+SLUG_LENGTH = 50
+TIT_GEN_CAT_STR_LENGTH = 15
+REV_AND_COM_STR_LENGTH = 30

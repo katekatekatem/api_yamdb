@@ -1,28 +1,27 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
-from reviews.validators import (names_validator_reserved, symbols_validator,
-                                validate_title_year)
+from reviews.validators import (names_validator_reserved, symbols_validator)
 
 
 class SignupSerializer(serializers.Serializer):
     username = serializers.CharField(
-        max_length=150,
+        max_length=settings.USERNAME_LENGHT,
         required=True,
         validators=[symbols_validator, names_validator_reserved]
     )
     email = serializers.EmailField(
-        max_length=150,
+        max_length=settings.EMAIL_LENGHT,
         required=True
     )
 
 
 class TokenSerializer(serializers.Serializer):
     username = serializers.CharField(
-        max_length=150,
+        max_length=settings.USERNAME_LENGHT,
         required=True,
         validators=[symbols_validator, names_validator_reserved]
     )
@@ -43,11 +42,6 @@ class AdminUserSerializer(serializers.ModelSerializer):
             'bio',
             'role'
         )
-
-    def validate_username(self, value):
-        symbols_validator(value)
-        names_validator_reserved(value)
-        return value
 
 
 class UserSerializer(AdminUserSerializer):
@@ -78,17 +72,11 @@ class TitleReadSerializer(serializers.ModelSerializer):
         read_only=True,
         many=True
     )
-    rating = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         fields = '__all__'
         model = Title
-
-    def get_rating(self, obj):
-        rating = obj.reviews.aggregate(Avg('score')).get('score__avg')
-        if not rating:
-            return rating
-        return int(rating)
 
 
 class TitleCreateSerializer(serializers.ModelSerializer):
@@ -106,9 +94,6 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = Title
 
-    def validate_year(self, value):
-        return validate_title_year(value)
-
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
@@ -121,14 +106,15 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         request = self.context['request']
-        title_id = self.context.get('view').kwargs.get('title_id')
-        title = get_object_or_404(Title, pk=title_id)
-        if (
-            request.method == 'POST' and Review.objects.filter(
+        if request.method == 'POST':
+            title_id = self.context.get('view').kwargs.get('title_id')
+            title = get_object_or_404(Title, pk=title_id)
+            if Review.objects.filter(
                 title=title, author=request.user
-            ).exists()
-        ):
-            raise ValidationError('Вы уже оставили отзыв на это произведение.')
+            ).exists():
+                raise ValidationError(
+                    'Вы уже оставили отзыв на это произведение.'
+                )
         return data
 
 
