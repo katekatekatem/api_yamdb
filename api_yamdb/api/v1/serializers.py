@@ -83,7 +83,6 @@ class TitleReadSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = Title
 
-
 class TitleCreateSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
@@ -98,9 +97,6 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Title
-
-    def validate_year(self, value):
-        return validate_title_year(value)
 
 
 class ReviewSerializer(serializers.ModelSerializer):

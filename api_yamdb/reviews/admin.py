@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import Category, Comment, CustomUser, Genre, Review, Title
 
 

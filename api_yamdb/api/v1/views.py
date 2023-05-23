@@ -109,10 +109,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
+    queryset = Title.objects.all()
     permission_classes = (IsAdminOrReadOnlyPermission,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
         if self.request.method in ('POST', 'PATCH'):
@@ -120,22 +121,14 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleReadSerializer
 
 
-class GenreViewSet(MixinViewSet):
+class GenreViewSet(ListModelCreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdminOrReadOnlyPermission,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
 
 
-class CategoryViewSet(MixinViewSet):
+class CategoryViewSet(ListModelCreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    filter_backends = (filters.SearchFilter,)
-    permission_classes = (IsAdminOrReadOnlyPermission,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
