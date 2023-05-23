@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db import IntegrityError
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
@@ -9,16 +10,17 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
 
 from .filters import TitleFilter
-from .mixins import ListModelCreateDestroyViewSet
+from .mixins import MixinViewSet
 from .permissions import (AdminPermission, IsAdminOrReadOnlyPermission,
                           IsStaffOrAuthorOrReadOnlyPermission)
 from .serializers import (AdminUserSerializer, CategorySerializer,
-                          CommentSerializer, GenreSerializer, ReviewSerializer,
-                          SignupSerializer, TitleCreateSerializer,
-                          TitleReadSerializer, TokenSerializer, UserSerializer)
+                          CommentSerializer, GenreSerializer,
+                          ReviewSerializer, SignupSerializer,
+                          TitleCreateSerializer, TitleReadSerializer,
+                          TokenSerializer, UserSerializer)
+from reviews.models import (Category, CustomUser, Genre, Review, Title)
 
 
 class SignUpView(APIView):
@@ -134,14 +136,20 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = (IsStaffOrAuthorOrReadOnlyPermission,)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
+    def get_title(self):
+        return get_object_or_404(
+            Title,
+            pk=self.kwargs.get('title_id')
+        )
+
     def get_queryset(self):
-        title_id = self.kwargs.get('title_id')
-        return Review.objects.filter(title=title_id)
+        return self.get_title().reviews.all()
 
     def perform_create(self, serializer):
-        title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Title, pk=title_id)
-        serializer.save(author=self.request.user, title=title)
+        serializer.save(
+            author=self.request.user,
+            title=self.get_title()
+        )
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -149,11 +157,18 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsStaffOrAuthorOrReadOnlyPermission,)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
+    def get_review(self):
+        return get_object_or_404(
+            Review,
+            pk=self.kwargs.get('review_id'),
+            title=self.kwargs.get('title_id'),
+        )
+
     def get_queryset(self):
-        review_id = self.kwargs.get('review_id')
-        return Comment.objects.filter(review=review_id)
+        return self.get_review().comments.all()
 
     def perform_create(self, serializer):
-        review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Review, pk=review_id)
-        serializer.save(author=self.request.user, review=review)
+        serializer.save(
+            author=self.request.user,
+            review=self.get_review()
+        )
