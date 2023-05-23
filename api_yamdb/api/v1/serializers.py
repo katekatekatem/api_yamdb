@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -9,19 +10,19 @@ from reviews.validators import (names_validator_reserved, symbols_validator,
 
 class SignupSerializer(serializers.Serializer):
     username = serializers.CharField(
-        max_length=150,
+        max_length=settings.USERNAME_LENGHT,
         required=True,
         validators=[symbols_validator, names_validator_reserved]
     )
     email = serializers.EmailField(
-        max_length=150,
+        max_length=settings.EMAIL_LENGHT,
         required=True
     )
 
 
 class TokenSerializer(serializers.Serializer):
     username = serializers.CharField(
-        max_length=150,
+        max_length=settings.USERNAME_LENGHT,
         required=True,
         validators=[symbols_validator, names_validator_reserved]
     )
@@ -42,11 +43,6 @@ class AdminUserSerializer(serializers.ModelSerializer):
             'bio',
             'role'
         )
-
-    def validate_username(self, value):
-        symbols_validator(value)
-        names_validator_reserved(value)
-        return value
 
 
 class UserSerializer(AdminUserSerializer):
@@ -82,6 +78,7 @@ class TitleReadSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Title
+
 
 class TitleCreateSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(

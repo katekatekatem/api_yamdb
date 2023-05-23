@@ -4,7 +4,6 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from api_yamdb.settings import NAME_LENGTH
-
 from .validators import (names_validator_reserved, symbols_validator,
                          validate_title_year)
 
@@ -22,10 +21,9 @@ ROLES = (
 
 class CustomUser(AbstractUser):
     """Модель пользователя."""
-
     username = models.CharField(
         verbose_name='Имя пользователя',
-        max_length=150,
+        max_length=settings.USERNAME_LENGHT,
         unique=True,
         validators=[
             symbols_validator,
@@ -34,7 +32,7 @@ class CustomUser(AbstractUser):
     )
     email = models.EmailField(
         verbose_name='Адрес эл. почты',
-        max_length=150,
+        max_length=settings.EMAIL_LENGHT,
         unique=True
     )
     bio = models.TextField(
@@ -56,7 +54,7 @@ class CustomUser(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.is_staff or self.role == ADMIN
+        return self.is_staff or self.role == ADMIN or self.is_superuser
 
     @property
     def is_moderator(self):

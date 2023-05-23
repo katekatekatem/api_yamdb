@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .filters import TitleFilter
 from .mixins import MixinViewSet
-from .permissions import (AdminPermission, IsAdminOrReadOnlyPermission,
+from .permissions import (IsAdminPermission, IsAdminOrReadOnlyPermission,
                           IsStaffOrAuthorOrReadOnlyPermission)
 from .serializers import (AdminUserSerializer, CategorySerializer,
                           CommentSerializer, GenreSerializer,
@@ -30,26 +30,52 @@ class SignUpView(APIView):
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        try:
-            user, _ = CustomUser.objects.get_or_create(
-                email=serializer.validated_data['email'],
-                username=serializer.validated_data['username']
-            )
-        except IntegrityError:
-            return Response(
-                'Данное имя пользователя и адрес эл. почты уже существуют',
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        username = serializer.validated_data['username']
+        email = serializer.validated_data['email']
+        existing_user = self.check_existing_user(username, email)
+        if not existing_user:
+            user = self.create_user(username, email)
+            if not user:
+                return Response(
+                    'Не удалось создать пользователя',
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            user = existing_user
         confirmation_code = default_token_generator.make_token(user)
-        to_email = serializer.validated_data['email']
+        to_email = email
+        self.send_confirmation_email(to_email, confirmation_code)
+        response_data = {
+            'username': user.username,
+            'email': user.email
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    def check_existing_user(self, username, email):
+        user = CustomUser.objects.filter(
+            username=username,
+            email=email
+        ).first()
+        return user
+
+    def create_user(self, username, email):
+        try:
+            user = CustomUser.objects.create(
+                email=email,
+                username=username
+            )
+            return user
+        except IntegrityError:
+            return None
+
+    def send_confirmation_email(self, email, confirmation_code):
         send_mail(
             'Добро пожаловать!',
             f'Ваш код подтверждения: {confirmation_code}.',
             settings.YAMDB_EMAIL,
-            [to_email],
+            [email],
             fail_silently=False,
         )
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class GetTokenView(APIView):
@@ -79,7 +105,7 @@ class UserViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     queryset = CustomUser.objects.all()
     serializer_class = AdminUserSerializer
-    permission_classes = (AdminPermission,)
+    permission_classes = (IsAdminPermission,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
     lookup_field = 'username'
