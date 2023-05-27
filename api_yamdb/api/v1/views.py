@@ -45,7 +45,7 @@ class SignUpView(APIView):
 
         if existing_user_by_email is not None:
             return Response(
-                'Пользователь с данным адресом электронной почты уже существует',
+                'Пользователь с данным адресом эл. почты уже существует',
                 status=status.HTTP_400_BAD_REQUEST
             )
 

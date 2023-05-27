@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
-from reviews.validators import (names_validator_reserved, symbols_validator)
+from reviews.validators import names_validator_reserved, symbols_validator
 
 
 class SignupSerializer(serializers.Serializer):
@@ -109,15 +109,16 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         request = self.context['request']
-        if request.method == 'POST':
-            title_id = self.context.get('view').kwargs.get('title_id')
-            title = get_object_or_404(Title, pk=title_id)
-            if Review.objects.filter(
-                title=title, author=request.user
-            ).exists():
-                raise ValidationError(
-                    'Вы уже оставили отзыв на это произведение.'
-                )
+        if request.method != 'POST':
+            return data
+        title_id = self.context.get('view').kwargs.get('title_id')
+        title = get_object_or_404(Title, pk=title_id)
+        if Review.objects.filter(
+            title=title, author=request.user
+        ).exists():
+            raise ValidationError(
+                'Вы уже оставили отзыв на это произведение.'
+            )
         return data
 
 
