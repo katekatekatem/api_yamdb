@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -10,72 +9,72 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from reviews.models import Category, CustomUser, Genre, Review, Title
 
 from .filters import TitleFilter
 from .mixins import ListCreateDestroyViewSet
-from .permissions import (IsAdminPermission, IsAdminOrReadOnlyPermission,
+from .permissions import (IsAdminOrReadOnlyPermission, IsAdminPermission,
                           IsStaffOrAuthorOrReadOnlyPermission)
 from .serializers import (AdminUserSerializer, CategorySerializer,
-                          CommentSerializer, GenreSerializer,
-                          ReviewSerializer, SignupSerializer,
-                          TitleCreateSerializer, TitleReadSerializer,
-                          TokenSerializer, UserSerializer)
-from reviews.models import (Category, CustomUser, Genre, Review, Title)
+                          CommentSerializer, GenreSerializer, ReviewSerializer,
+                          SignupSerializer, TitleCreateSerializer,
+                          TitleReadSerializer, TokenSerializer, UserSerializer)
 
 
 class SignUpView(APIView):
-    http_method_names = ['post', ]
-    permission_classes = (permissions.AllowAny,)
+    http_method_names = ['post']
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data['username']
         email = serializer.validated_data['email']
-        existing_user = self.check_existing_user(username, email)
-        if not existing_user:
-            user = self.create_user(username, email)
-            if not user:
-                return Response(
-                    'Не удалось создать пользователя',
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        else:
-            user = existing_user
+        username = serializer.validated_data['username']
+        existing_user_by_username = self.get_user_by_username(username)
+        existing_user_by_email = self.get_user_by_email(email)
+        user_by_username = existing_user_by_username is not None
+        user_by_email = existing_user_by_email is not None
+        if user_by_username and user_by_email:
+            return Response(status=status.HTTP_200_OK)
+
+        if existing_user_by_username is not None:
+            return Response(
+                'Пользователь с данным именем пользователя уже существует',
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if existing_user_by_email is not None:
+            return Response(
+                'Пользователь с данным адресом эл. почты уже существует',
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user, _ = CustomUser.objects.get_or_create(
+            email=email,
+            username=username
+        )
         confirmation_code = default_token_generator.make_token(user)
         to_email = email
-        self.send_confirmation_email(to_email, confirmation_code)
-        response_data = {
-            'username': user.username,
-            'email': user.email
-        }
-        return Response(response_data, status=status.HTTP_200_OK)
-
-    def check_existing_user(self, username, email):
-        user = CustomUser.objects.filter(
-            username=username,
-            email=email
-        ).first()
-        return user
-
-    def create_user(self, username, email):
-        try:
-            user = CustomUser.objects.create(
-                email=email,
-                username=username
-            )
-            return user
-        except IntegrityError:
-            return None
-
-    def send_confirmation_email(self, email, confirmation_code):
         send_mail(
-            'Добро пожаловать!',
+            'Вы зарегистрировались на сайте YaMDb',
             f'Ваш код подтверждения: {confirmation_code}.',
             settings.YAMDB_EMAIL,
-            [email],
+            [to_email],
             fail_silently=False,
         )
+
+        response_data = {
+            'email': email,
+            'username': username,
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    def get_user_by_username(self, username):
+        return CustomUser.objects.filter(username=username).first()
+
+    def get_user_by_email(self, email):
+        return CustomUser.objects.filter(email=email).first()
 
 
 class GetTokenView(APIView):
@@ -93,7 +92,7 @@ class GetTokenView(APIView):
             data = {'token': str(access_token)}
             return Response(
                 data,
-                status=status.HTTP_201_CREATED
+                status=status.HTTP_200_OK
             )
         return Response(
             'Некорректный код.',
@@ -140,6 +139,17 @@ class TitleViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
     http_method_names = ['get', 'post', 'patch', 'delete']
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        rating = self.queryset.filter(
+            pk=serializer.instance.pk
+        ).values_list('rating', flat=True).first()
+        serialized_data = serializer.data
+        serialized_data['rating'] = rating
+        return Response(serialized_data, status=status.HTTP_201_CREATED)
 
     def get_serializer_class(self):
         if self.request.method in ('POST', 'PATCH'):
