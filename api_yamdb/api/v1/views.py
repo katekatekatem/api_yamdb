@@ -141,6 +141,17 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_class = TitleFilter
     http_method_names = ['get', 'post', 'patch', 'delete']
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        rating = self.queryset.filter(
+            pk=serializer.instance.pk
+        ).values_list('rating', flat=True).first()
+        serialized_data = serializer.data
+        serialized_data['rating'] = rating
+        return Response(serialized_data, status=status.HTTP_201_CREATED)
+
     def get_serializer_class(self):
         if self.request.method in ('POST', 'PATCH'):
             return TitleCreateSerializer
