@@ -32,24 +32,15 @@ class SignUpView(APIView):
         username = serializer.validated_data['username']
         existing_user_by_username = self.get_user_by_username(username)
         existing_user_by_email = self.get_user_by_email(email)
-
         if existing_user_by_username != existing_user_by_email:
             return Response(
                 'Пользователь с такими данными уже существует',
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        if existing_user_by_username == existing_user_by_email:
-            user, _ = CustomUser.objects.get_or_create(
-                email=email,
-                username=username
-            )
-            if existing_user_by_username != existing_user_by_email:
-                return Response(
-                    'Пользователь с такими данными уже существует',
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
+        user, _ = CustomUser.objects.get_or_create(
+            email=email,
+            username=username
+        )
         confirmation_code = default_token_generator.make_token(user)
         to_email = email
         send_mail(
@@ -59,7 +50,6 @@ class SignUpView(APIView):
             [to_email],
             fail_silently=False,
         )
-
         response_data = {
             'email': email,
             'username': username,
