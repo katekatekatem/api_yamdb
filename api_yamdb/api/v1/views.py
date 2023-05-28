@@ -38,7 +38,7 @@ class SignUpView(APIView):
                 'Пользователь с такими данными уже существует',
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         if existing_user_by_username == existing_user_by_email:
             user, _ = CustomUser.objects.get_or_create(
                 email=email,
